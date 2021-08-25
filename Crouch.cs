@@ -49,7 +49,7 @@ namespace Crouch
 
         public Player Ryley = Player.main;
         public static CrouchBehavior main;
-        public Vector3 forceDir = Player.main.transform.up;
+        public Vector3 forceDir = MainCameraControl.main.transform.forward;
 
         private void Awake()
 
@@ -76,6 +76,7 @@ namespace Crouch
 
             {
                 kickAllowed = true;
+                global::Utils.PlayFMODAsset(Ryley.footStepSounds.landSound, hit.transform.position, 1f);
             }
 
             else

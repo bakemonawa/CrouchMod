@@ -13,16 +13,16 @@ namespace Crouch
     using SMLHelper.V2.Utility;
     using UWE;
 
-    
-      
+
+
     [HarmonyPatch(typeof(Player))]
-    [HarmonyPatch("Awake")]   
+    [HarmonyPatch("Awake")]
 
     public class PlayerAwakePatch
     {
         [HarmonyPostfix]
 
-        public static void AddCrouchBehavior (Player __instance)
+        public static void AddCrouchBehavior(Player __instance)
 
         {
             __instance.gameObject.AddComponent<CrouchBehavior>();
@@ -37,59 +37,16 @@ namespace Crouch
 
     public class PlayerUpdatePatch
     {
-        
+
 
         [HarmonyPrefix]
 
-        
+
         public static void CrouchCheck(Player __instance)
 
         {
             CrouchBehavior.main.UpdateTarget();
 
-            if (Input.GetKeyDown(CrouchPatcher.Config.PitchControlKey))
-
-            {
-                CrouchBehavior.main.pitchToggled = !CrouchBehavior.main.pitchToggled;
-            }
-
-            if (CrouchBehavior.main.pitchToggled)
-
-            {
-                MainCameraControl.main.minimumY = -360f;
-                MainCameraControl.main.maximumY = 360f;
-
-            }
-
-            else if (!CrouchBehavior.main.pitchToggled)
-
-            {
-                MainCameraControl.main.minimumY = -80f;
-                MainCameraControl.main.maximumY = 80f;
-            }
-
-
-            if (Input.GetKeyDown(CrouchPatcher.Config.KickOffKey))
-            {
-
-                
-                float timekickstop = 0f;
-
-                if (Input.GetKeyDown(CrouchPatcher.Config.KickOffKey) && GameInput.GetButtonDown(GameInput.Button.MoveForward))
-
-                {
-                    CrouchBehavior.main.forceDir = MainCameraControl.main.transform.forward;
-                }
-
-                if (timekickstop == Time.time + 4f)
-
-                {
-                    
-                    CrouchBehavior.main.kickOff = false;
-                }
-                
-            }
-                
 
             if (Input.GetKeyDown(CrouchPatcher.Config.CrouchKey))
 
@@ -102,7 +59,7 @@ namespace Crouch
                 //decrease traversal speed
 
                 //hijack jump key, set it to become kick-off/leave crouch state button when player is in crouch state.                
-                
+
 
                 if (__instance.IsUnderwater() || __instance.IsUnderwaterForSwimming())
 
@@ -115,6 +72,16 @@ namespace Crouch
                         CrouchBehavior.main.OnKickOff();
                         CrouchBehavior.main.kickOff = true;
                         CrouchBehavior.main.isCrouchingUnderwater = false;
+
+                        float timekickstop = 0f;
+
+
+                        if (timekickstop == Time.time + 4f)
+
+                        {
+
+                            CrouchBehavior.main.kickOff = false;
+                        }
                     }
 
                     // If player kicks off when not allowed, leave crouch state
@@ -138,16 +105,64 @@ namespace Crouch
 
                 }
 
-            }            
+            }
 
             else if (Input.GetKeyDown(CrouchPatcher.Config.TestKey))
 
             {
-                
+
                 CrouchBehavior.main.Test();
             }
 
         }
+
+        [HarmonyPostfix]
+
+        public static void PitchCheck(Player __instance)
+        {
+            if (Input.GetKeyDown(CrouchPatcher.Config.PitchControlKey))
+
+            {
+                CrouchBehavior.main.pitchToggled = !CrouchBehavior.main.pitchToggled;
+            }
+
+            if (CrouchBehavior.main.pitchToggled)
+
+            {
+                MainCameraControl.main.minimumY = -360f;
+                MainCameraControl.main.maximumY = 360f;
+
+
+            }
+
+            else if (!CrouchBehavior.main.pitchToggled)
+
+            {
+                MainCameraControl.main.minimumY = -80f;
+                MainCameraControl.main.maximumY = 80f;
+            }
+
+        }
+    }
+
+    [HarmonyPatch(typeof(Player))]
+    [HarmonyPatch("FixedUpdate")]
+
+    public class PlayerFixedUpdatePatch
+    {
+
+
+        [HarmonyPostfix]
+        public static void UpdatePitch (Player __instance)
+        {
+
+            if (CrouchBehavior.main.pitchToggled)
+            {
+                Rigidbody proper = __instance.rigidBody;
+                proper.position = __instance.transform.position;
+            }
+        
+         }
     }
 
     [HarmonyPatch(typeof(ArmsController))]

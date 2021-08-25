@@ -12,7 +12,7 @@ namespace Crouch
     public class PlayerRotatePatcher
     {
 
-        public static Vector3 velocity = Vector3.zero;
+        public static float velocity = 0f;
 
         [HarmonyPrefix]
 
@@ -31,20 +31,24 @@ namespace Crouch
         [HarmonyPostfix]
         public static void AlignBody(Player __instance)
         {
-            Vector3 origin = __instance.transform.forward;
-            Vector3 target = MainCameraControl.main.transform.forward;
+            float origin = __instance.transform.eulerAngles.y;
+            Transform target = MainCameraControl.main.transform;            
+            float smooth = 0.3f;
+            
             
 
             if (CrouchBehavior.main.pitchToggled)
             {
                 
-                __instance.transform.forward = Vector3.SmoothDamp(origin, target, ref velocity, 0.5f);
-                Rigidbody proper = __instance.rigidBody;
-                proper.position = __instance.transform.position;
-                proper.rotation = __instance.transform.rotation;                
+                float yAngle = Mathf.SmoothDampAngle(origin, target.eulerAngles.y, ref velocity, 1f, smooth);
+
+                Vector3 targetpos = target.position;
+                targetpos += Quaternion.Euler(0, yAngle, 0) * new Vector3(0, 0, -1);
+
+                __instance.transform.position = targetpos;                                              
 
             }           
-
+            
         }
     }
 }
