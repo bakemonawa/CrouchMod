@@ -1,0 +1,15 @@
+﻿{
+  "Id": "CrouchMod",
+  "DisplayName": "Crouch Mod",
+  "Author": "FalseLight",
+  "Version": "0.0.1",
+  "Enable": true,
+  "AssemblyName": "Crouch.dll",
+  "VersionDependencies": 
+  
+  {
+    "SMLHelper": "2.11"
+  },
+
+  "Game": "Subnautica"
+}
